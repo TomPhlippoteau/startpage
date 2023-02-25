@@ -1,14 +1,21 @@
 <script setup>
 
     import commandsAvailable from './data/commands.json';
+    import Commandls from './components/Commandls.vue';
     import Bookmarks from './components/Bookmark.vue';
     import Help from './components/Help.vue';
     import Model from './components/Model.vue';
+    import Message from './components/Message.vue';
+
     import { ref, reactive } from 'vue'
+
+    import { useStructureStore } from "./stores/structureStore";
 
     let user = {
         name: 'Tom'
     };
+
+    let structure = useStructureStore();
 
     let insertCommand = () => {
 
@@ -17,14 +24,35 @@
         }
         else {
             let cmd = commandInput.value;
-        
+            let response = null;
             let data = analyseCommand(commandInput.value);
             console.log(data);
             //  if( this.commandsAvailable[ type ] !== undefined && cmds.length === 0 ) {
-            if( ['help', 'bookmarks', 'specs', 'man', 'model'].indexOf(data.command) >= 0 ) {
+            if( ['help', 'bookmarks', 'specs', 'man', 'model', 'ls', 'cd'].indexOf(data.command) >= 0 ) {
+             
+                let component = data.command ;
+
+                if ( data.command === 'cd') {
+                    if( data.value === '..' ) {
+                        response = structure.reverse();
+                    }
+                    else {
+                        response = structure.forward(data.value);
+                    }
+
+                    component = 'message';
+                    data.response = response;
+                    
+                }
+                else if( data.command === 'ls' ) {
+                    console.log(structure.ls());
+                    data.response = structure.ls();
+                }
+             
                 commands.push({
                     command: cmd,
-                    components: data.command,
+                    component : component,
+                    data: data,
                 });
             }
 
@@ -56,6 +84,7 @@
                 command: type,
                 params : options,
                 value: cmds.join(' '),
+                path: structure.pwd,
             };
     };
 
@@ -72,7 +101,8 @@
     let commands = reactive([
         {
             command : "bookmarks",
-            components: "bookmarks", 
+            component: 'bookmarks',
+            data: analyseCommand('bookmarks')
         }
     ]);
 
@@ -98,7 +128,9 @@
                 <div v-for="(command, index) in commands" :key="index">
 
                     <div class="command-line">
-                        <span class="username">{{ user.name }} : </span>
+                        <span class="username">{{ user.name }}</span>
+                        <span class="path" v-if="command.data.path.length > 0"> : {{ command.data.path }}</span> 
+                        <span class="username"> > </span>
                         <span class="command">{{ command.command }}</span>
                     </div>
 
@@ -107,9 +139,11 @@
                     </div>
 
                     <div class="command-result" v-else-if="command.components !== false">
-                        <Bookmarks v-if="command.components === 'bookmarks'"></Bookmarks>
-                        <Help v-if="command.components === 'help'"></Help>
-                        <Model v-if="command.components === 'model'" :search="analyseCommand(command.command)"></Model>
+                        <Message v-if="command.component === 'message'" :data="command.data"></Message>
+                        <Commandls v-if="command.component === 'ls'" :data="command.data"></Commandls>
+                        <Bookmarks v-if="command.component === 'bookmarks'"></Bookmarks>
+                        <Help v-if="command.component === 'help'"></Help>
+                        <Model v-if="command.component === 'model'" :search="analyseCommand(command.command)"></Model>
                     </div>
                 </div>
             </div>
