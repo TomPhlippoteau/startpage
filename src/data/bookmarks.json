@@ -1,0 +1,120 @@
+{
+	"bookmarks": [
+		{
+			"category": "Main",
+			"private": false,
+			"color": "cyan",
+			"links": [
+				{
+					"subcategory" : "Emails",
+					"links": [
+						{
+							"name": "Gmail (Tom)",
+							"url": "https://mail.google.com/mail/u/1/"
+						},
+						{
+							"name": "ProtonMail",
+							"url": "https://mail.proton.me/u/0/inbox"
+						}
+					]
+				}
+			]
+
+		},
+		{
+			"category": "Medias",
+			"private": false,
+			"color": "pink",
+			"links": [
+				{
+					"subcategory" : "Streaming",
+					"links": [
+						{
+							"name": "Netflix",
+							"url": "https://www.netflix.com/browse"
+						},
+						{
+							"name": "Prime video",
+							"url": "https://www.primevideo.com/"
+						},
+						{
+							"name": "Disney plus",
+							"url": "https://www.disneyplus.com/fr-fr/home"
+						},
+						{
+							"name": "Twitch",
+							"url": "https://www.twitch.tv/"
+						},
+						{
+							"name": "Youtube",
+							"url": "https://www.youtube.com/"
+						}
+                        
+					]
+				},
+				{
+					"subcategory" : "Social",
+					"links": [
+						{
+							"name": "Reddit",
+							"url": "https://www.reddit.com/"
+						},
+						{
+							"name": "Twitter",
+							"url": "https://twitter.com/home"
+						}
+					]
+				}
+			]
+
+		},
+		{
+			"category": "Serious shit",
+			"private": false,
+			"color": "lime",
+			"links": [
+				{
+					"subcategory" : "Finance",
+					"links": [
+						{
+							"name": "Credit Agricole",
+							"url": "https://perrotin.com/"
+						},
+						{
+							"name": "Banque postale",
+							"url": "https://devel.perrotin.com/"
+						}
+					]
+				}
+			]
+
+		},
+		{
+			"category": "Docs front",
+			"private": false,
+			"color": "purple",
+			"links": [
+				{
+					"subcategory" : "Back-end",
+					"links": [
+						{
+							"name": "Laravel",
+							"url": "https://laravel.com/"
+						}
+					]
+				},
+				{
+					"subcategory" : "Front-end",
+					"links": [
+						{
+							"name": "Vuejs",
+							"url": "https://vuejs.org/v2/guide/"
+						}
+					]
+				}
+			]
+
+		}
+	]
+
+}

@@ -1,0 +1,43 @@
+.inlineblock {
+
+	display: inline-block;
+	vertical-align: top;
+
+	.title {
+		font-weight:bold;
+	}
+
+	.subtitle {
+		font-weight:bold;
+	}
+}
+
+.ul-bookmarks { 
+	width: 25%;
+	li {
+		padding: 0.1rem 0;
+	}
+}
+
+.ul-specs {
+	width: 100%;
+}
+
+ul {
+    padding: 0;
+  	margin: 0;
+ 	list-style: none;
+}
+
+.c-help {
+	span {
+
+		display: inline-block;
+		
+
+	}
+
+	.main {
+			width: 8rem;
+		}
+}
