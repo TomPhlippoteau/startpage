@@ -68,7 +68,9 @@ export let useStructureStore = defineStore('structure', {
             if (pwd.length == 0) {
                 if( toCreate === true ) {
                     if( isFolder === true ) {
-                        const newFolder = { name: data.value, colors:'', folders: {}, files: {} };
+                        console.log(data.params.color);
+                        let color = (data.params.color === undefined) ? '' : data.params.color;
+                        const newFolder = { name: data.value, colors: color, folders: {}, files: {} };
                         treeFolders[folder].folders[ data.value ] = newFolder;
                     }
                     else {
