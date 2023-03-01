@@ -15,6 +15,13 @@ export let useStructureStore = defineStore('structure', {
         };
     },
 
+    getters: {
+        bookmarks() {
+            console.log( this.treeData['~'].folders.bookmarks );
+            return this.treeData['~'].folders.bookmarks;
+        }
+    },
+
     actions: {
 
         ls() {
