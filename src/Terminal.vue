@@ -28,7 +28,7 @@
             let data = analyseCommand(commandInput.value);
             console.log(data);
             //  if( this.commandsAvailable[ type ] !== undefined && cmds.length === 0 ) {
-            if( ['help', 'bookmarks', 'specs', 'man', 'model', 'ls', 'cd'].indexOf(data.command) >= 0 ) {
+            if( ['help', 'bookmarks', 'specs', 'man', 'model', 'ls', 'cd', 'mkdir', 'touch'].indexOf(data.command) >= 0 ) {
              
                 let component = data.command ;
 
@@ -48,7 +48,12 @@
                     console.log(structure.ls());
                     data.response = structure.ls();
                 }
-             
+                else if( data.command === 'mkdir' ) {
+                    data.response = structure.createFolder(data);
+                }
+                else if( data.command === 'touch' ) {
+                    data.response = structure.createFile(data);
+                }
                 commands.push({
                     command: cmd,
                     component : component,
@@ -70,22 +75,26 @@
 
     let analyseCommand = (cmd) => {
 
-            let cmds = cmd.split(' ');
-            
-            let type = cmds.shift(); // remove command name
-            let options = [];
+            let options = cmd.split('--');
 
-            if( cmds[0] !== undefined && cmds[0][0] === '-' ) {
-                options = cmds[0].split('');
-                cmds.shift() // remove options
-            }
+            let mainCommand = options.shift();
+            mainCommand = mainCommand.split(' ');
+            let type = mainCommand.shift();
+
+            let optionsArr = {};
+            options.forEach(option => {
+                let detailOption = option.split(' ');
+                let optionType = detailOption.shift();
+                optionsArr[ optionType ] = detailOption.join(' ');
+            });
 
             return {
                 command: type,
-                params : options,
-                value: cmds.join(' '),
+                params : optionsArr,
+                value: mainCommand.join(' '),
                 path: structure.pwd,
             };
+
     };
 
     let historyPrev = () => {

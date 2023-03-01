@@ -1,27 +1,42 @@
 import { defineStore } from "pinia";
+import { useStorage } from '@vueuse/core';
 
 export let useStructureStore = defineStore('structure', {
 
     state() {
         return {
-            pwd : '',
-            data: {
-                'bookmarks': { type: 'folder', name: 'bookmarks', colors:'red', contents: {
-                        'general': { type: 'folder', name: 'General', colors:'', contents: [] },
-                        'medias': { type: 'folder', name: 'Medias', colors:'', contents: [] },
-                        'fun stuff': { type: 'folder', name: 'Fun stuff', colors:'', contents: [] }
-                    } ,
-                }
-            }
+            pwd : '~',
+            treeData: useStorage('home-structure', {
+                '~': { name: '~', color: 'red', files: {},  folders: {
+                    'bookmarks': { name: 'Bookmarks', color:'', files: {},  folders: {} },
+                } }
+            })
+
         };
     },
 
     actions: {
 
         ls() {
-
-            let files = this.data;
+            
             let path = this.pwd.split('/');
+            let response = this.recursiveSave( this.treeData, path, {}, true, false );
+
+            console.log({response});
+            return {
+                response: true,
+                folders: response.folders,
+                files: response.files
+            };
+
+        },
+
+
+
+        findFolderPosition( pwd )
+        {
+            let path = pwd.split('/');
+            let files = this.data;
 
             path.forEach(dir => {
                 if( dir.length > 0 && files !== undefined ) {
@@ -31,30 +46,107 @@ export let useStructureStore = defineStore('structure', {
                 }
             });
 
+        },
+
+        /**
+         * 
+         * @param {object} treeFolders  
+         * @param {array} pwd 
+         * @param {object} data 
+         */
+        recursiveSave( treeFolders, pwd, data, isFolder = true, toCreate = true ) {
+
+            let folder = pwd.shift();
+
+            if (pwd.length == 0) {
+                if( toCreate === true ) {
+                    if( isFolder === true ) {
+                        const newFolder = { name: data.value, colors:'', folders: {}, files: {} };
+                        treeFolders[folder].folders[ data.value ] = newFolder;
+                    }
+                    else {
+                        const newFile = { name: data.value, link: data.params.link };
+                        treeFolders[folder].files[ data.value ] = newFile;
+                    }
+                    return treeFolders;
+                }
+                else {
+                    return treeFolders[folder];
+                }
+                
+            }
+            else if( treeFolders[folder] === undefined ) {
+                return false;
+            }
+            else {
+                return this.recursiveSave( treeFolders[folder].folders, pwd, data, isFolder, toCreate);
+            }
+            
+
+        },
+
+        saveToLocalStorage(){
+            localStorage.setItem('home-structure', this.treeData);
+        },
+
+        createFile( data ) {
+            let path = this.pwd.split('/');
+
+            let response = this.recursiveSave( this.treeData, path, data, false );
+
+            if( response !== false ) {
+                this.data = response;
+            }
+
+            this.saveToLocalStorage();
+
             return {
                 response: true,
-                files: files,
+            };
+        },
+
+        createFolder( data ) {
+            
+            let path = this.pwd.split('/');
+
+            let response = this.recursiveSave( this.treeData, path, data );
+
+            if( response !== false ) {
+                this.data = response;
+            }
+
+            this.saveToLocalStorage();
+
+            return {
+                response: true,
             };
 
         },
 
+        getPwdArray() {
+            return this.pwd.split('/');
+        },
+
         forward(folder) {
 
-            let path = this.pwd.split('/');
+            let path = this.getPwdArray()
             path.push(folder);
 
-            if( folder[0] === '/') {
-                path = folder.split('/');
+            if( folder[0] === '~') {
+                path = ['~'];
+                if( folder.length > 1 ) {
+                    path = folder.split('/');
+                } 
             }
-        
-            let folders = this.data;
-            let folderFound = true;
+
+            let folders = this.treeData;
+            let folderFound = true
 
             path.forEach(dir => {
                 if( dir.length > 0 && folders !== undefined ) {
                     console.log({folders});
                     if( folders[dir] !== undefined){
-                        folders = folders[dir].contents;
+                        folders = folders[dir].folders;
                     }
                     else {
                         folderFound = false;
@@ -63,7 +155,13 @@ export let useStructureStore = defineStore('structure', {
             });
 
             if( folderFound === true ) {
-                this.pwd = path.join('/');
+
+                if( folder[0] === '/') {
+                    this.pwd = folder;
+                }
+                else {
+                    this.pwd = path.join('/');
+                }
 
                 return {
                     response: true,
@@ -76,22 +174,26 @@ export let useStructureStore = defineStore('structure', {
                 msg: 'folder does not exist ' + folder,
             }; 
 
-
         },
 
         reverse() {
             
-            if( this.pwd === '' ) {
+            if( this.pwd === '~' ) {
                 return {
                     response: false,
                     msg: 'you cannot go back any further... idiot.'
                 };
             }
 
-            let path = this.pwd.split('/');
+            let path = this.getPwdArray();
             path.pop();
 
-            return this.forward( path.join('/'));
+            let pwdStr = path.join('/');
+            if( path.length === 0 ) {
+                pwdStr = '~';
+            }
+
+            return this.forward( pwdStr );
 
         }
     } 
